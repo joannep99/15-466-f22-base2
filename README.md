@@ -1,15 +1,16 @@
-# (TODO: your game's title)
+# Bird Runs
 
-Author: (TODO: your name)
+Author: Joanne Park
 
-Design: (TODO: In two sentences or fewer, describe what is new and interesting about your game.)
+Design: 
+It is a 3d version of flappy bird with new obstacles. 
 
 Screen Shot:
 
-![Screen Shot](screenshot.png)
+![Screen Shot](game.png)
 
 How To Play:
 
-(TODO: describe the controls and (if needed) goals/strategy.)
+Could not compile game, and was having difficulty with the code.
 
 This game was built with [NEST](NEST.md).

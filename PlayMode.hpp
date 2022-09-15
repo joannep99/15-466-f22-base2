@@ -28,6 +28,7 @@ struct PlayMode : Mode {
 	Scene scene;
 
 	//hexapod leg to wobble:
+	// Scene::Transform *cube = nullptr;
 	Scene::Transform *hip = nullptr;
 	Scene::Transform *upper_leg = nullptr;
 	Scene::Transform *lower_leg = nullptr;

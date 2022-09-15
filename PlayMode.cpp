@@ -21,28 +21,32 @@ Load< MeshBuffer > hexapod_meshes(LoadTagDefault, []() -> MeshBuffer const * {
 
 Load< Scene > hexapod_scene(LoadTagDefault, []() -> Scene const * {
 	return new Scene(data_path("hexapod.scene"), [&](Scene &scene, Scene::Transform *transform, std::string const &mesh_name){
+		printf("%s\n", mesh_name.c_str());
 		Mesh const &mesh = hexapod_meshes->lookup(mesh_name);
-
-		scene.drawables.emplace_back(transform);
+		// Scene::Drawable &drawable = [];
 		Scene::Drawable &drawable = scene.drawables.back();
-
+		printf("%s\n", "PlayMode");
 		drawable.pipeline = lit_color_texture_program_pipeline;
-
+		printf("%s\n", "PlayMode");
 		drawable.pipeline.vao = hexapod_meshes_for_lit_color_texture_program;
 		drawable.pipeline.type = mesh.type;
 		drawable.pipeline.start = mesh.start;
 		drawable.pipeline.count = mesh.count;
+		printf("%s\n", "PlayMode");
 
 	});
 });
 
 PlayMode::PlayMode() : scene(*hexapod_scene) {
+	// printf("%s\n", "PlayMode");
 	//get pointers to leg for convenience:
 	for (auto &transform : scene.transforms) {
+		// printf("%s\n", transform.name.c_str());
 		if (transform.name == "Hip.FL") hip = &transform;
 		else if (transform.name == "UpperLeg.FL") upper_leg = &transform;
-		else if (transform.name == "LowerLeg.FL") lower_leg = &transform;
+		else if (transform.name == "LowerLeg.FL") lower_leg = &transform; 
 	}
+	// if (cube == nullptr) throw std::runtime_error("Hip not found.");
 	if (hip == nullptr) throw std::runtime_error("Hip not found.");
 	if (upper_leg == nullptr) throw std::runtime_error("Upper leg not found.");
 	if (lower_leg == nullptr) throw std::runtime_error("Lower leg not found.");
@@ -125,6 +129,7 @@ void PlayMode::update(float elapsed) {
 	wobble += elapsed / 10.0f;
 	wobble -= std::floor(wobble);
 
+
 	hip->rotation = hip_base_rotation * glm::angleAxis(
 		glm::radians(5.0f * std::sin(wobble * 2.0f * float(M_PI))),
 		glm::vec3(0.0f, 1.0f, 0.0f)
@@ -152,12 +157,15 @@ void PlayMode::update(float elapsed) {
 		//make it so that moving diagonally doesn't go faster:
 		if (move != glm::vec2(0.0f)) move = glm::normalize(move) * PlayerSpeed * elapsed;
 
-		glm::mat4x3 frame = camera->transform->make_local_to_parent();
-		glm::vec3 frame_right = frame[0];
-		//glm::vec3 up = frame[1];
-		glm::vec3 frame_forward = -frame[2];
+		glm::mat4x3 upperleg_frame = upper_leg->parent->parent->parent->make_local_to_parent();
+		glm::vec3 frame_right = upperleg_frame[0];
+		glm::vec3 frame_forward = -upperleg_frame[2];
+		upper_leg->parent->parent->parent->position += move.x * frame_right + move.y * frame_forward;
+		
 
-		camera->transform->position += move.x * frame_right + move.y * frame_forward;
+		// lower_leg->position += glm::vec3(0.0f, move.y, move.x);
+		// hip->position += glm::vec3(0.0f, move.y, move.x);
+		// camera->transform->position += move.x * frame_right + move.y * frame_forward;
 	}
 
 	//reset button press counters:
